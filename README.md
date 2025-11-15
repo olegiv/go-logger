@@ -166,7 +166,9 @@ go test -cover
 
 ## License
 
-See LICENSE file for details.
+MIT License - Copyright (c) 2025 Oleg Ivanchenko
+
+See [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
