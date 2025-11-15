@@ -1,5 +1,8 @@
 # go-logger
 
+[![CodeQL Advanced](https://github.com/olegiv/go-logger/actions/workflows/codeql.yml/badge.svg)](https://github.com/olegiv/go-logger/actions/workflows/codeql.yml)
+[![Dependency review](https://github.com/olegiv/go-logger/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/olegiv/go-logger/actions/workflows/dependency-review.yml)
+
 A lightweight, production-ready Go logging library built on top of [zerolog](https://github.com/rs/zerolog) with automatic log rotation using [lumberjack](https://github.com/natefinch/lumberjack).
 
 ## Features
