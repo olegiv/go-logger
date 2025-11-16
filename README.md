@@ -2,6 +2,7 @@
 
 [![CodeQL Advanced](https://github.com/olegiv/go-logger/actions/workflows/codeql.yml/badge.svg)](https://github.com/olegiv/go-logger/actions/workflows/codeql.yml)
 [![Dependency review](https://github.com/olegiv/go-logger/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/olegiv/go-logger/actions/workflows/dependency-review.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/olegiv/go-logger.svg)](https://pkg.go.dev/github.com/olegiv/go-logger)
 
 A lightweight, production-ready Go logging library built on top of [zerolog](https://github.com/rs/zerolog) with automatic log rotation using [lumberjack](https://github.com/natefinch/lumberjack).
 
@@ -36,6 +37,7 @@ func main() {
     log := logger.New(logger.Config{
         Level:      "info",
         LogDir:     "./logs",
+        Filename:   "app.log",
         MaxSizeMB:  10,
         MaxBackups: 5,
         Console:    true,
@@ -64,6 +66,7 @@ The `Config` struct supports the following options:
 |-------|------|---------|-------------|
 | `Level` | string | `"info"` | Log level: `debug`, `info`, `warn`, or `error` |
 | `LogDir` | string | `"./logs"` | Directory where log files are stored |
+| `Filename` | string | `"go.log"` | Name of the log file |
 | `MaxSizeMB` | int | `10` | Maximum size of a log file in megabytes before rotation |
 | `MaxBackups` | int | `5` | Maximum number of old log files to retain |
 | `Console` | bool | `false` | Enable console output in addition to file logging |
@@ -119,6 +122,7 @@ if err != nil {
 log := logger.New(logger.Config{
     Level:      "info",
     LogDir:     "/var/log/myapp",
+    Filename:   "myapp.log",
     MaxSizeMB:  100,
     MaxBackups: 10,
     Console:    false, // File only in production
@@ -137,7 +141,7 @@ log := logger.New(logger.Config{
 ## Log Output Format
 
 ### File Output
-Logs are written to `{LogDir}/go.log` in JSON format:
+Logs are written to `{LogDir}/{Filename}` in JSON format:
 ```json
 {"level":"info","time":"2025-11-15T10:30:00Z","caller":"main.go:42","message":"Application started"}
 ```

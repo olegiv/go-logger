@@ -19,6 +19,7 @@ type Logger struct {
 type Config struct {
 	Level      string // debug, info, warn, error
 	LogDir     string
+	Filename   string // Log filename (default: "go.log")
 	MaxSizeMB  int
 	MaxBackups int
 	Console    bool // Enable console output
@@ -29,6 +30,9 @@ func New(cfg Config) *Logger {
 	// Set defaults
 	if cfg.LogDir == "" {
 		cfg.LogDir = "./logs"
+	}
+	if cfg.Filename == "" {
+		cfg.Filename = "go.log"
 	}
 	if cfg.MaxSizeMB == 0 {
 		cfg.MaxSizeMB = 10
@@ -51,7 +55,7 @@ func New(cfg Config) *Logger {
 
 	// Configure file rotation
 	fileWriter := &lumberjack.Logger{
-		Filename:   filepath.Join(cfg.LogDir, "go.log"),
+		Filename:   filepath.Join(cfg.LogDir, cfg.Filename),
 		MaxSize:    cfg.MaxSizeMB,
 		MaxBackups: cfg.MaxBackups,
 		MaxAge:     30, // days

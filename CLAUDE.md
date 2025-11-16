@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **`logger.go`**: Main library implementation
   - `Logger` struct: Wraps `zerolog.Logger` to provide enhanced functionality
-  - `Config` struct: Configuration for log level, directory, rotation settings, and console output
+  - `Config` struct: Configuration for log level, directory, filename, rotation settings, and console output
   - `New()`: Factory function that creates a logger with multi-writer support (file + optional console)
   - Context methods: `WithField()`, `WithFields()`, `WithError()` - all return new logger instances preserving immutability
 
@@ -25,11 +25,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Log Rotation Behavior
 
-- Log files are written to `{LogDir}/go.log`
+- Log files are written to `{LogDir}/{Filename}` (default: `./logs/go.log`)
 - Automatic rotation when file reaches `MaxSizeMB` (default: 10MB)
 - Keeps `MaxBackups` old files (default: 5)
-- Automatically deletes logs older than 30 days (hardcoded in `logger.go:57`)
-- Old logs are NOT compressed (`Compress: false` in `logger.go:58`)
+- Automatically deletes logs older than 30 days (hardcoded in `logger.go:61`)
+- Old logs are NOT compressed (`Compress: false` in `logger.go:62`)
 
 ## Development Commands
 
@@ -84,6 +84,7 @@ Tests use `t.TempDir()` to create isolated temporary directories for each test c
 When creating a logger, these defaults apply:
 - `Level`: `"info"` if empty or unrecognized
 - `LogDir`: `"./logs"` if empty
+- `Filename`: `"go.log"` if empty
 - `MaxSizeMB`: `10` if zero
 - `MaxBackups`: `5` if zero
 - `Console`: `false` by default

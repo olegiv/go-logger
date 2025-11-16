@@ -218,6 +218,7 @@ func TestLogFileCreation(t *testing.T) {
 	cfg := Config{
 		Level:      "info",
 		LogDir:     tmpDir,
+		Filename:   "test.log",
 		MaxSizeMB:  10,
 		MaxBackups: 5,
 		Console:    false,
@@ -229,7 +230,7 @@ func TestLogFileCreation(t *testing.T) {
 	logger.Info().Msg("Test log message")
 
 	// Check that log file was created
-	logFile := filepath.Join(tmpDir, "go.log")
+	logFile := filepath.Join(tmpDir, "test.log")
 	if _, err := os.Stat(logFile); os.IsNotExist(err) {
 		t.Error("Log file should be created")
 	}
@@ -239,6 +240,7 @@ func TestConfigStructure(t *testing.T) {
 	cfg := Config{
 		Level:      "debug",
 		LogDir:     "/tmp/logs",
+		Filename:   "custom.log",
 		MaxSizeMB:  20,
 		MaxBackups: 10,
 		Console:    true,
@@ -250,6 +252,10 @@ func TestConfigStructure(t *testing.T) {
 
 	if cfg.LogDir != "/tmp/logs" {
 		t.Error("LogDir not set correctly")
+	}
+
+	if cfg.Filename != "custom.log" {
+		t.Error("Filename not set correctly")
 	}
 
 	if cfg.MaxSizeMB != 20 {
@@ -466,4 +472,47 @@ func TestEmptyLogDir(t *testing.T) {
 	// Default should be "./logs"
 	// Verify it was created or fallback to stderr
 	logger.Info().Msg("Test")
+}
+
+func TestFilenameDefault(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	cfg := Config{
+		Level:  "info",
+		LogDir: tmpDir,
+	}
+
+	logger := New(cfg)
+	logger.Info().Msg("Test default filename")
+
+	// Verify default filename "go.log" is created
+	logFile := filepath.Join(tmpDir, "go.log")
+	if _, err := os.Stat(logFile); os.IsNotExist(err) {
+		t.Error("Log file should be created with default filename 'go.log'")
+	}
+}
+
+func TestCustomFilename(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	cfg := Config{
+		Level:    "info",
+		LogDir:   tmpDir,
+		Filename: "myapp.log",
+	}
+
+	logger := New(cfg)
+	logger.Info().Msg("Test custom filename")
+
+	// Verify custom filename is used
+	logFile := filepath.Join(tmpDir, "myapp.log")
+	if _, err := os.Stat(logFile); os.IsNotExist(err) {
+		t.Error("Log file should be created with custom filename 'myapp.log'")
+	}
+
+	// Verify default filename is NOT created
+	defaultFile := filepath.Join(tmpDir, "go.log")
+	if _, err := os.Stat(defaultFile); !os.IsNotExist(err) {
+		t.Error("Default log file should not be created when custom filename is specified")
+	}
 }
