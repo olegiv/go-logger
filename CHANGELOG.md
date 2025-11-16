@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0] - 2025-11-16
+
+### Added
+
+- Configurable log filename via `Filename` field in `Config` struct
+- Default filename remains "go.log" for backward compatibility
+- New tests: `TestFilenameDefault` and `TestCustomFilename`
+- pkg.go.dev reference badge to README
+
+### Changed
+
+- Updated documentation to reflect configurable filename option
+
 ## [0.0.0] - 2025-11-15
 
 ### Added
@@ -32,4 +45,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complete documentation and README
 - GitHub Actions workflows for CodeQL and Dependency Review
 
+[0.1.0]: https://github.com/olegiv/go-logger/releases/tag/v0.1.0
 [0.0.0]: https://github.com/olegiv/go-logger/releases/tag/v0.0.0
