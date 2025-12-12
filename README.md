@@ -16,6 +16,7 @@ A lightweight, production-ready Go logging library built on top of [zerolog](htt
 - **Contextual logging** with field support
 - **Timestamp tracking** on all log entries
 - **Zero allocation** logging in most cases (thanks to zerolog)
+- **Security hardened** with path traversal protection and secure directory permissions
 
 ## Installation
 
@@ -138,6 +139,58 @@ log := logger.New(logger.Config{
     Level:   "debug",
     Console: true, // See logs in terminal during development
 })
+```
+
+## Security
+
+This library implements security best practices to protect against common vulnerabilities:
+
+### Path Traversal Protection
+
+All file paths are automatically sanitized to prevent directory traversal attacks:
+
+- **Path Cleaning**: Paths are normalized using `filepath.Clean()` to remove `.` and `..` segments
+- **Traversal Detection**: Attempts to use `..` in paths are detected and blocked
+- **Filename Validation**: Filenames cannot contain path separators (`/` or `\`)
+- **Safe Fallback**: Invalid paths trigger automatic fallback to stderr with security warnings
+
+```go
+// ✅ Valid paths - these work correctly
+logger.New(logger.Config{LogDir: "./logs"})
+logger.New(logger.Config{LogDir: "./logs/app/debug"})
+logger.New(logger.Config{Filename: "app.v2.log"})
+
+// ❌ Blocked paths - these fall back to stderr
+logger.New(logger.Config{LogDir: "../../etc"})           // Path traversal
+logger.New(logger.Config{Filename: "../etc/passwd"})     // Path in filename
+```
+
+### Secure Directory Permissions
+
+Log directories are created with restrictive permissions by default:
+
+- **Default**: `0750` (rwxr-x---) - Owner and group only
+- **Configurable**: Set custom permissions via `DirMode`
+- **Recommended for sensitive logs**: `0700` (rwx------) - Owner only
+
+```go
+// Maximum security - owner-only access
+logger.New(logger.Config{
+    LogDir:  "/var/log/myapp",
+    DirMode: 0700,
+})
+```
+
+### Security Warnings
+
+When security violations are detected, warnings are logged to stderr:
+
+```json
+{
+  "level": "error",
+  "security_warning": "path traversal detected in LogDir: ../../etc",
+  "message": "SECURITY: Invalid logger configuration, falling back to stderr"
+}
 ```
 
 ## Log Output Format

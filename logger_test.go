@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/rs/zerolog"
@@ -567,5 +568,153 @@ func TestDirModeCustom(t *testing.T) {
 	actualPerms := info.Mode().Perm()
 	if actualPerms != expectedPerms {
 		t.Errorf("Expected directory permissions %o, got %o", expectedPerms, actualPerms)
+	}
+}
+
+func TestPathTraversalPrevention(t *testing.T) {
+	tests := []struct {
+		name           string
+		logDir         string
+		filename       string
+		shouldFallback bool
+		description    string
+	}{
+		{
+			name:           "simple path traversal",
+			logDir:         "../../etc",
+			filename:       "test.log",
+			shouldFallback: true,
+			description:    "Should block simple .. traversal",
+		},
+		{
+			name:           "nested path traversal",
+			logDir:         "./logs/../../etc",
+			filename:       "test.log",
+			shouldFallback: true,
+			description:    "Should block nested traversal",
+		},
+		{
+			name:           "filename with path separator",
+			logDir:         "./logs",
+			filename:       "../etc/test.log",
+			shouldFallback: true,
+			description:    "Should block filename with path separator",
+		},
+		{
+			name:           "filename with backslash",
+			logDir:         "./logs",
+			filename:       "..\\etc\\test.log",
+			shouldFallback: true,
+			description:    "Should block filename with backslash",
+		},
+		{
+			name:           "valid relative path",
+			logDir:         "./logs/app",
+			filename:       "test.log",
+			shouldFallback: false,
+			description:    "Should allow valid relative path",
+		},
+		{
+			name:           "valid nested directory",
+			logDir:         "./logs/level1/level2",
+			filename:       "test.log",
+			shouldFallback: false,
+			description:    "Should allow valid nested directory",
+		},
+		{
+			name:           "filename with dots but not traversal",
+			logDir:         "./logs",
+			filename:       "app.v2.log",
+			shouldFallback: false,
+			description:    "Should allow filename with dots (not traversal)",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tmpDir := t.TempDir()
+
+			// For valid paths, use tmpDir as base
+			logDir := tt.logDir
+			if !tt.shouldFallback {
+				logDir = filepath.Join(tmpDir, tt.logDir)
+			}
+
+			cfg := Config{
+				LogDir:   logDir,
+				Filename: tt.filename,
+			}
+
+			logger := New(cfg)
+			if logger == nil {
+				t.Fatal("Expected logger to be created (should fall back to stderr if needed)")
+			}
+
+			// For paths that should be blocked, verify directory wasn't created outside tmpDir
+			if tt.shouldFallback {
+				// Logger should have fallen back to stderr
+				// We can't directly check if it's using stderr, but we can verify
+				// that the dangerous directory wasn't created
+				if strings.Contains(tt.logDir, "..") {
+					// Directory with traversal shouldn't exist
+					if _, err := os.Stat(tt.logDir); err == nil {
+						t.Errorf("%s: dangerous directory was created: %s", tt.description, tt.logDir)
+					}
+				}
+			} else {
+				// For valid paths, verify the directory was created
+				if _, err := os.Stat(logDir); os.IsNotExist(err) {
+					t.Errorf("%s: valid directory was not created: %s", tt.description, logDir)
+				}
+			}
+		})
+	}
+}
+
+func TestPathCleaning(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	tests := []struct {
+		name       string
+		inputDir   string
+		shouldWork bool
+	}{
+		{
+			name:       "path with redundant slashes",
+			inputDir:   "./logs//app///debug",
+			shouldWork: true,
+		},
+		{
+			name:       "path with dot segments",
+			inputDir:   "./logs/./app/./debug",
+			shouldWork: true,
+		},
+		{
+			name:       "mixed separators (cleaned)",
+			inputDir:   "./logs/app/debug",
+			shouldWork: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			logDir := filepath.Join(tmpDir, tt.inputDir)
+
+			cfg := Config{
+				LogDir: logDir,
+			}
+
+			logger := New(cfg)
+			if logger == nil {
+				t.Fatal("Expected logger to be created")
+			}
+
+			if tt.shouldWork {
+				// Verify directory exists (path should be cleaned and created)
+				if _, err := os.Stat(logDir); os.IsNotExist(err) {
+					t.Errorf("Directory should exist after path cleaning: %s", logDir)
+				}
+			}
+		})
 	}
 }

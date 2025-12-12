@@ -45,6 +45,22 @@ func New(cfg Config) *Logger {
 		cfg.DirMode = 0750 // rwxr-x--- (more secure default)
 	}
 
+	// Sanitize and validate paths to prevent path traversal attacks
+	cfg.LogDir = filepath.Clean(cfg.LogDir)
+	cfg.Filename = filepath.Clean(cfg.Filename)
+
+	// Check for path traversal attempts in LogDir
+	if strings.Contains(cfg.LogDir, "..") {
+		// Path traversal detected - fall back to stderr with warning
+		return createStderrLogger("path traversal detected in LogDir: " + cfg.LogDir)
+	}
+
+	// Validate filename doesn't contain path separators
+	if strings.ContainsAny(cfg.Filename, `/\`) || strings.Contains(cfg.Filename, "..") {
+		// Invalid filename - fall back to stderr with warning
+		return createStderrLogger("invalid filename (contains path separators or traversal): " + cfg.Filename)
+	}
+
 	// Create log directory if it doesn't exist
 	if err := os.MkdirAll(cfg.LogDir, cfg.DirMode); err != nil {
 		// Fallback to stderr if directory creation fails
@@ -89,6 +105,17 @@ func New(cfg Config) *Logger {
 		Logger()
 
 	return &Logger{Logger: logger}
+}
+
+// createStderrLogger creates a logger that writes to stderr with a security warning
+func createStderrLogger(warningMsg string) *Logger {
+	// Log security warning to stderr
+	stderrLogger := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	stderrLogger.Error().
+		Str("security_warning", warningMsg).
+		Msg("SECURITY: Invalid logger configuration, falling back to stderr")
+
+	return &Logger{Logger: stderrLogger}
 }
 
 // parseLogLevel converts string log level to zerolog level
