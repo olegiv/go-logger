@@ -72,6 +72,7 @@ The `Config` struct supports the following options:
 | `MaxBackups` | int | `5` | Maximum number of old log files to retain |
 | `Console` | bool | `false` | Enable console output in addition to file logging |
 | `DirMode` | os.FileMode | `0750` | Directory permissions (rwxr-x---) for log directory |
+| `DisableCaller` | bool | `false` | Disable caller info (file:line) in logs for enhanced privacy |
 
 ### Log Rotation
 
@@ -180,6 +181,35 @@ logger.New(logger.Config{
     DirMode: 0700,
 })
 ```
+
+### Privacy: Caller Information Control
+
+By default, the logger includes caller information (source file and line number) in all log entries for debugging purposes:
+
+```json
+{"level":"info","time":"2025-11-15T10:30:00Z","caller":"main.go:42","message":"Application started"}
+```
+
+For enhanced privacy and security, you can disable caller information to prevent exposing internal application structure:
+
+```go
+// Disable caller info for production logs
+logger.New(logger.Config{
+    LogDir:        "/var/log/myapp",
+    DisableCaller: true,  // Omit file paths from logs
+})
+```
+
+**When to disable caller info**:
+- Production environments where logs may be accessed by untrusted parties
+- When log files could be exposed (e.g., public S3 buckets, log aggregation services)
+- Compliance requirements (GDPR, HIPAA) that prohibit exposing internal paths
+- To prevent reconnaissance attacks that use file structure information
+
+**When to keep caller info enabled** (default):
+- Development and debugging
+- Controlled production environments with secure log access
+- When troubleshooting issues requires stack trace context
 
 ### Security Warnings
 

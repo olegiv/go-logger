@@ -824,3 +824,113 @@ func TestDirectoryCreationErrorLogging(t *testing.T) {
 	// The error message will appear in test output if running with -v flag.
 	logger.Info().Msg("Test message after directory creation failure")
 }
+
+func TestCallerInfoEnabled(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Test with caller info enabled (default behavior)
+	cfg := Config{
+		Level:         "info",
+		LogDir:        tmpDir,
+		Filename:      "caller-enabled.log",
+		DisableCaller: false, // Explicitly enabled (though this is the default)
+	}
+
+	logger := New(cfg)
+	if logger == nil {
+		t.Fatal("Expected logger to be created")
+	}
+
+	// Write a log message
+	logger.Info().Msg("Test message with caller")
+
+	// Read the log file and verify caller info is present
+	logFile := filepath.Join(tmpDir, "caller-enabled.log")
+	content, err := os.ReadFile(logFile)
+	if err != nil {
+		t.Fatalf("Failed to read log file: %v", err)
+	}
+
+	// Log should contain caller information (file and line number)
+	logStr := string(content)
+	if !strings.Contains(logStr, `"caller"`) {
+		t.Error("Expected log to contain 'caller' field when DisableCaller is false")
+	}
+	if !strings.Contains(logStr, "logger_test.go") {
+		t.Error("Expected log to contain source file name")
+	}
+}
+
+func TestCallerInfoDisabled(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Test with caller info disabled
+	cfg := Config{
+		Level:         "info",
+		LogDir:        tmpDir,
+		Filename:      "caller-disabled.log",
+		DisableCaller: true, // Explicitly disable caller info
+	}
+
+	logger := New(cfg)
+	if logger == nil {
+		t.Fatal("Expected logger to be created")
+	}
+
+	// Write a log message
+	logger.Info().Msg("Test message for privacy mode")
+
+	// Read the log file and verify caller info is NOT present
+	logFile := filepath.Join(tmpDir, "caller-disabled.log")
+	content, err := os.ReadFile(logFile)
+	if err != nil {
+		t.Fatalf("Failed to read log file: %v", err)
+	}
+
+	// Log should NOT contain caller information
+	logStr := string(content)
+	if strings.Contains(logStr, `"caller"`) {
+		t.Errorf("Expected log to NOT contain 'caller' field when DisableCaller is true. Got: %s", logStr)
+	}
+	if strings.Contains(logStr, "logger_test.go") {
+		t.Errorf("Expected log to NOT contain source file name when DisableCaller is true. Got: %s", logStr)
+	}
+
+	// Verify message is still logged
+	if !strings.Contains(logStr, "Test message for privacy mode") {
+		t.Error("Expected log message to be present")
+	}
+}
+
+func TestCallerInfoDefaultBehavior(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Test default behavior (DisableCaller not set, should default to false = enabled)
+	cfg := Config{
+		Level:    "info",
+		LogDir:   tmpDir,
+		Filename: "caller-default.log",
+		// DisableCaller not set, defaults to false (caller enabled)
+	}
+
+	logger := New(cfg)
+	if logger == nil {
+		t.Fatal("Expected logger to be created")
+	}
+
+	// Write a log message
+	logger.Info().Msg("Test message with default caller behavior")
+
+	// Read the log file and verify caller info is present (default behavior)
+	logFile := filepath.Join(tmpDir, "caller-default.log")
+	content, err := os.ReadFile(logFile)
+	if err != nil {
+		t.Fatalf("Failed to read log file: %v", err)
+	}
+
+	// By default, caller should be enabled for backward compatibility
+	logStr := string(content)
+	if !strings.Contains(logStr, `"caller"`) {
+		t.Error("Expected log to contain 'caller' field by default (backward compatibility)")
+	}
+}
