@@ -63,10 +63,14 @@ func New(cfg Config) *Logger {
 
 	// Create log directory if it doesn't exist
 	if err := os.MkdirAll(cfg.LogDir, cfg.DirMode); err != nil {
-		// Fallback to stderr if directory creation fails
-		return &Logger{
-			Logger: zerolog.New(os.Stderr).With().Timestamp().Logger(),
-		}
+		// Log the error to stderr using structured logging before falling back
+		stderrLogger := zerolog.New(os.Stderr).With().Timestamp().Logger()
+		stderrLogger.Error().
+			Err(err).
+			Str("log_dir", cfg.LogDir).
+			Msg("Failed to create log directory, falling back to stderr")
+
+		return &Logger{Logger: stderrLogger}
 	}
 
 	// Parse log level (set per-logger, not globally)

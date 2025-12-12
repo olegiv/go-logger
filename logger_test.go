@@ -802,3 +802,25 @@ func TestMultipleLoggersWithDifferentLevels(t *testing.T) {
 		t.Errorf("Info logger should be at INFO level, got %v", infoLogger.GetLevel())
 	}
 }
+
+func TestDirectoryCreationErrorLogging(t *testing.T) {
+	// Test that directory creation failures are properly logged to stderr
+	// Use a path that will fail on most systems (requires root permissions)
+	cfg := Config{
+		Level:   "info",
+		LogDir:  "/root/forbidden/path/that/should/not/exist",
+		Console: false,
+	}
+
+	logger := New(cfg)
+
+	// Logger should still be created (fallback to stderr)
+	if logger == nil {
+		t.Fatal("Expected logger to be created even with invalid directory (fallback)")
+	}
+
+	// Note: We can't easily capture stderr in this test without significant refactoring,
+	// but the logger should still be functional and writing to stderr.
+	// The error message will appear in test output if running with -v flag.
+	logger.Info().Msg("Test message after directory creation failure")
+}
