@@ -718,3 +718,87 @@ func TestPathCleaning(t *testing.T) {
 		})
 	}
 }
+
+func TestNoGlobalLevelPollution(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Create a baseline zerolog logger at DEBUG level
+	baselineLogger := zerolog.New(os.Stdout).Level(zerolog.DebugLevel)
+
+	// Verify baseline logger is at DEBUG level
+	if baselineLogger.GetLevel() != zerolog.DebugLevel {
+		t.Fatalf("Baseline logger should be at DEBUG level, got %v", baselineLogger.GetLevel())
+	}
+
+	// Create go-logger instance at ERROR level
+	cfg := Config{
+		LogDir: tmpDir,
+		Level:  "error",
+	}
+	errorLogger := New(cfg)
+
+	// Verify go-logger has ERROR level
+	if errorLogger.GetLevel() != zerolog.ErrorLevel {
+		t.Errorf("go-logger should be at ERROR level, got %v", errorLogger.GetLevel())
+	}
+
+	// CRITICAL: Verify baseline logger still has DEBUG level (not polluted)
+	if baselineLogger.GetLevel() != zerolog.DebugLevel {
+		t.Errorf("Baseline logger level should remain DEBUG, got %v (global state pollution detected!)", baselineLogger.GetLevel())
+	}
+
+	// Verify global level was not changed
+	globalLevel := zerolog.GlobalLevel()
+	// Note: zerolog.GlobalLevel() defaults to TraceLevel if never set
+	// We just verify that creating our logger didn't force it to ErrorLevel
+	if globalLevel == zerolog.ErrorLevel {
+		t.Errorf("Global level should not be ERROR (indicates SetGlobalLevel was called)")
+	}
+}
+
+func TestMultipleLoggersWithDifferentLevels(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Create logger at DEBUG level
+	cfg1 := Config{
+		LogDir: filepath.Join(tmpDir, "debug"),
+		Level:  "debug",
+	}
+	debugLogger := New(cfg1)
+
+	// Create logger at ERROR level
+	cfg2 := Config{
+		LogDir: filepath.Join(tmpDir, "error"),
+		Level:  "error",
+	}
+	errorLogger := New(cfg2)
+
+	// Verify both loggers maintain their independent levels
+	if debugLogger.GetLevel() != zerolog.DebugLevel {
+		t.Errorf("Debug logger should be at DEBUG level, got %v", debugLogger.GetLevel())
+	}
+
+	if errorLogger.GetLevel() != zerolog.ErrorLevel {
+		t.Errorf("Error logger should be at ERROR level, got %v", errorLogger.GetLevel())
+	}
+
+	// Create a third logger at INFO level
+	cfg3 := Config{
+		LogDir: filepath.Join(tmpDir, "info"),
+		Level:  "info",
+	}
+	infoLogger := New(cfg3)
+
+	// Verify all three loggers still have their original levels
+	if debugLogger.GetLevel() != zerolog.DebugLevel {
+		t.Errorf("Debug logger level changed after creating other loggers, got %v", debugLogger.GetLevel())
+	}
+
+	if errorLogger.GetLevel() != zerolog.ErrorLevel {
+		t.Errorf("Error logger level changed after creating other loggers, got %v", errorLogger.GetLevel())
+	}
+
+	if infoLogger.GetLevel() != zerolog.InfoLevel {
+		t.Errorf("Info logger should be at INFO level, got %v", infoLogger.GetLevel())
+	}
+}

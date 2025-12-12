@@ -69,9 +69,8 @@ func New(cfg Config) *Logger {
 		}
 	}
 
-	// Set log level
+	// Parse log level (set per-logger, not globally)
 	level := parseLogLevel(cfg.Level)
-	zerolog.SetGlobalLevel(level)
 
 	// Configure file rotation
 	fileWriter := &lumberjack.Logger{
@@ -97,8 +96,9 @@ func New(cfg Config) *Logger {
 
 	multiWriter := io.MultiWriter(writers...)
 
-	// Create logger
+	// Create logger with per-instance level (not global)
 	logger := zerolog.New(multiWriter).
+		Level(level).
 		With().
 		Timestamp().
 		Caller().
