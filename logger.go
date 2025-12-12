@@ -17,12 +17,13 @@ type Logger struct {
 
 // Config holds logger configuration
 type Config struct {
-	Level      string // debug, info, warn, error
+	Level      string      // debug, info, warn, error
 	LogDir     string
-	Filename   string // Log filename (default: "go.log")
+	Filename   string      // Log filename (default: "go.log")
 	MaxSizeMB  int
 	MaxBackups int
-	Console    bool // Enable console output
+	Console    bool        // Enable console output
+	DirMode    os.FileMode // Directory permissions (default: 0750)
 }
 
 // New creates a new logger instance
@@ -40,9 +41,12 @@ func New(cfg Config) *Logger {
 	if cfg.MaxBackups == 0 {
 		cfg.MaxBackups = 5
 	}
+	if cfg.DirMode == 0 {
+		cfg.DirMode = 0750 // rwxr-x--- (more secure default)
+	}
 
 	// Create log directory if it doesn't exist
-	if err := os.MkdirAll(cfg.LogDir, 0755); err != nil {
+	if err := os.MkdirAll(cfg.LogDir, cfg.DirMode); err != nil {
 		// Fallback to stderr if directory creation fails
 		return &Logger{
 			Logger: zerolog.New(os.Stderr).With().Timestamp().Logger(),

@@ -516,3 +516,56 @@ func TestCustomFilename(t *testing.T) {
 		t.Error("Default log file should not be created when custom filename is specified")
 	}
 }
+
+func TestDirModeDefault(t *testing.T) {
+	tmpDir := t.TempDir()
+	logDir := filepath.Join(tmpDir, "test-perms")
+
+	cfg := Config{
+		LogDir: logDir,
+	}
+
+	logger := New(cfg)
+	if logger == nil {
+		t.Fatal("Expected logger to be created")
+	}
+
+	// Verify directory was created with default permissions (0750)
+	info, err := os.Stat(logDir)
+	if err != nil {
+		t.Fatalf("Log directory should be created: %v", err)
+	}
+
+	expectedPerms := os.FileMode(0750)
+	actualPerms := info.Mode().Perm()
+	if actualPerms != expectedPerms {
+		t.Errorf("Expected directory permissions %o, got %o", expectedPerms, actualPerms)
+	}
+}
+
+func TestDirModeCustom(t *testing.T) {
+	tmpDir := t.TempDir()
+	logDir := filepath.Join(tmpDir, "test-custom-perms")
+
+	cfg := Config{
+		LogDir:  logDir,
+		DirMode: 0700,
+	}
+
+	logger := New(cfg)
+	if logger == nil {
+		t.Fatal("Expected logger to be created")
+	}
+
+	// Verify directory was created with custom permissions (0700)
+	info, err := os.Stat(logDir)
+	if err != nil {
+		t.Fatalf("Log directory should be created: %v", err)
+	}
+
+	expectedPerms := os.FileMode(0700)
+	actualPerms := info.Mode().Perm()
+	if actualPerms != expectedPerms {
+		t.Errorf("Expected directory permissions %o, got %o", expectedPerms, actualPerms)
+	}
+}

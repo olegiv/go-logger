@@ -70,6 +70,7 @@ The `Config` struct supports the following options:
 | `MaxSizeMB` | int | `10` | Maximum size of a log file in megabytes before rotation |
 | `MaxBackups` | int | `5` | Maximum number of old log files to retain |
 | `Console` | bool | `false` | Enable console output in addition to file logging |
+| `DirMode` | os.FileMode | `0750` | Directory permissions (rwxr-x---) for log directory |
 
 ### Log Rotation
 
@@ -126,6 +127,7 @@ log := logger.New(logger.Config{
     MaxSizeMB:  100,
     MaxBackups: 10,
     Console:    false, // File only in production
+    DirMode:    0700,  // Owner-only access (rwx------) for sensitive logs
 })
 ```
 
