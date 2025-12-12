@@ -118,10 +118,24 @@ func TestClose(t *testing.T) {
 		t.Fatal("Expected logger to be created")
 	}
 
-	err := logger.Close()
+	// Write some logs
+	logger.Info().Msg("Test message before close")
 
+	// Close the logger
+	err := logger.Close()
 	if err != nil {
 		t.Errorf("Close should not return error: %v", err)
+	}
+
+	// Verify log file exists and contains the message
+	logFile := filepath.Join(tmpDir, "go.log")
+	content, err := os.ReadFile(logFile)
+	if err != nil {
+		t.Fatalf("Failed to read log file: %v", err)
+	}
+
+	if !strings.Contains(string(content), "Test message before close") {
+		t.Error("Expected log message to be flushed to file")
 	}
 }
 
@@ -932,5 +946,172 @@ func TestCallerInfoDefaultBehavior(t *testing.T) {
 	logStr := string(content)
 	if !strings.Contains(logStr, `"caller"`) {
 		t.Error("Expected log to contain 'caller' field by default (backward compatibility)")
+	}
+}
+
+func TestCloseFlushesLogs(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	cfg := Config{
+		Level:    "info",
+		LogDir:   tmpDir,
+		Filename: "flush-test.log",
+	}
+
+	logger := New(cfg)
+	if logger == nil {
+		t.Fatal("Expected logger to be created")
+	}
+
+	// Write multiple log messages
+	for i := 0; i < 10; i++ {
+		logger.Info().Int("iteration", i).Msg("Test message")
+	}
+
+	// Close should flush all logs
+	err := logger.Close()
+	if err != nil {
+		t.Fatalf("Close returned error: %v", err)
+	}
+
+	// Verify all messages were written
+	logFile := filepath.Join(tmpDir, "flush-test.log")
+	content, err := os.ReadFile(logFile)
+	if err != nil {
+		t.Fatalf("Failed to read log file: %v", err)
+	}
+
+	logStr := string(content)
+	// Count occurrences of "Test message"
+	count := strings.Count(logStr, "Test message")
+	if count != 10 {
+		t.Errorf("Expected 10 log messages, found %d", count)
+	}
+}
+
+func TestWithFieldPreservesFileWriter(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	cfg := Config{
+		Level:    "info",
+		LogDir:   tmpDir,
+		Filename: "withfield-test.log",
+	}
+
+	logger := New(cfg)
+	if logger == nil {
+		t.Fatal("Expected logger to be created")
+	}
+
+	// Create a new logger with field
+	loggerWithField := logger.WithField("test_key", "test_value")
+
+	// Write log with the new logger
+	loggerWithField.Info().Msg("Test message with field")
+
+	// Close the new logger (should work if fileWriter is preserved)
+	err := loggerWithField.Close()
+	if err != nil {
+		t.Fatalf("Close on logger with field returned error: %v", err)
+	}
+
+	// Verify message was written
+	logFile := filepath.Join(tmpDir, "withfield-test.log")
+	content, err := os.ReadFile(logFile)
+	if err != nil {
+		t.Fatalf("Failed to read log file: %v", err)
+	}
+
+	logStr := string(content)
+	if !strings.Contains(logStr, "Test message with field") {
+		t.Error("Expected log message to be present")
+	}
+	if !strings.Contains(logStr, "test_value") {
+		t.Error("Expected field value to be present")
+	}
+}
+
+func TestWithFieldsPreservesFileWriter(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	cfg := Config{
+		Level:    "info",
+		LogDir:   tmpDir,
+		Filename: "withfields-test.log",
+	}
+
+	logger := New(cfg)
+	if logger == nil {
+		t.Fatal("Expected logger to be created")
+	}
+
+	// Create a new logger with fields
+	loggerWithFields := logger.WithFields(map[string]interface{}{
+		"key1": "value1",
+		"key2": 42,
+	})
+
+	// Write log with the new logger
+	loggerWithFields.Info().Msg("Test message with fields")
+
+	// Close the new logger
+	err := loggerWithFields.Close()
+	if err != nil {
+		t.Fatalf("Close on logger with fields returned error: %v", err)
+	}
+
+	// Verify message was written
+	logFile := filepath.Join(tmpDir, "withfields-test.log")
+	content, err := os.ReadFile(logFile)
+	if err != nil {
+		t.Fatalf("Failed to read log file: %v", err)
+	}
+
+	logStr := string(content)
+	if !strings.Contains(logStr, "Test message with fields") {
+		t.Error("Expected log message to be present")
+	}
+}
+
+func TestWithErrorPreservesFileWriter(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	cfg := Config{
+		Level:    "info",
+		LogDir:   tmpDir,
+		Filename: "witherror-test.log",
+	}
+
+	logger := New(cfg)
+	if logger == nil {
+		t.Fatal("Expected logger to be created")
+	}
+
+	// Create a new logger with error
+	testErr := errors.New("test error")
+	loggerWithError := logger.WithError(testErr)
+
+	// Write log with the new logger
+	loggerWithError.Error().Msg("Test message with error")
+
+	// Close the new logger
+	err := loggerWithError.Close()
+	if err != nil {
+		t.Fatalf("Close on logger with error returned error: %v", err)
+	}
+
+	// Verify message was written
+	logFile := filepath.Join(tmpDir, "witherror-test.log")
+	content, err := os.ReadFile(logFile)
+	if err != nil {
+		t.Fatalf("Failed to read log file: %v", err)
+	}
+
+	logStr := string(content)
+	if !strings.Contains(logStr, "Test message with error") {
+		t.Error("Expected log message to be present")
+	}
+	if !strings.Contains(logStr, "test error") {
+		t.Error("Expected error message to be present")
 	}
 }

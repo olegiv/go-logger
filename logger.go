@@ -13,6 +13,7 @@ import (
 // Logger wraps zerolog.Logger with additional functionality
 type Logger struct {
 	zerolog.Logger
+	fileWriter io.Closer // Reference to lumberjack writer for proper cleanup
 }
 
 // Config holds logger configuration
@@ -116,7 +117,10 @@ func New(cfg Config) *Logger {
 
 	logger := ctx.Logger()
 
-	return &Logger{Logger: logger}
+	return &Logger{
+		Logger:     logger,
+		fileWriter: fileWriter, // Store for proper cleanup on Close()
+	}
 }
 
 // createStderrLogger creates a logger that writes to stderr with a security warning
@@ -146,16 +150,22 @@ func parseLogLevel(level string) zerolog.Level {
 	}
 }
 
-// Close closes the logger (flushes any buffered logs)
+// Close closes the logger and flushes any buffered logs
 func (l *Logger) Close() error {
-	// Zerolog doesn't require explicit closing, but we can sync here if needed
+	// Close the underlying file writer to ensure all logs are flushed
+	if l.fileWriter != nil {
+		return l.fileWriter.Close()
+	}
 	return nil
 }
 
 // WithField adds a field to the logger
 func (l *Logger) WithField(key string, value interface{}) *Logger {
 	newLogger := l.Logger.With().Interface(key, value).Logger()
-	return &Logger{Logger: newLogger}
+	return &Logger{
+		Logger:     newLogger,
+		fileWriter: l.fileWriter, // Preserve fileWriter reference
+	}
 }
 
 // WithFields adds multiple fields to the logger
@@ -165,11 +175,17 @@ func (l *Logger) WithFields(fields map[string]interface{}) *Logger {
 		ctx = ctx.Interface(k, v)
 	}
 	newLogger := ctx.Logger()
-	return &Logger{Logger: newLogger}
+	return &Logger{
+		Logger:     newLogger,
+		fileWriter: l.fileWriter, // Preserve fileWriter reference
+	}
 }
 
 // WithError adds an error to the logger context
 func (l *Logger) WithError(err error) *Logger {
 	newLogger := l.Logger.With().Err(err).Logger()
-	return &Logger{Logger: newLogger}
+	return &Logger{
+		Logger:     newLogger,
+		fileWriter: l.fileWriter, // Preserve fileWriter reference
+	}
 }
