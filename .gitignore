@@ -39,7 +39,7 @@ logs/
 *.swp
 *.swo
 *~
-.claude
+.claude/settings.local.json
 
 # OS files
 .DS_Store

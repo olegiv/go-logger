@@ -152,6 +152,33 @@ When `Console` is enabled, logs are displayed in a human-readable format:
 2025-11-15 10:30:00 INF Application started caller=main.go:42
 ```
 
+## Development with Claude Code
+
+This project includes Claude Code extensions for enhanced development workflow:
+
+### Quick Commands
+
+```bash
+/test              # Run all tests
+/test-coverage     # Generate coverage report
+/test-race         # Run with race detector
+/lint              # Check code quality
+/fmt               # Format all files
+/mod-tidy          # Clean up dependencies
+/deps-update       # Update dependencies
+/benchmark         # Run benchmarks
+/security-audit    # Run security audit and CVE scan
+```
+
+### Specialized Agents
+
+- **@go-test-runner** - Testing and coverage analysis
+- **@go-code-quality** - Linting and formatting
+- **@go-dependency-manager** - Dependency management
+- **@security-auditor** - Security audits and vulnerability scanning
+
+See [CLAUDE.md](CLAUDE.md) for detailed usage.
+
 ## Testing
 
 Run the test suite:
@@ -164,6 +191,13 @@ Run tests with coverage:
 
 ```bash
 go test -cover
+```
+
+Generate HTML coverage report:
+
+```bash
+go test -coverprofile=coverage.out
+go tool cover -html=coverage.out -o coverage.html
 ```
 
 ## Dependencies
