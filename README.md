@@ -257,8 +257,37 @@ go tool cover -html=coverage.out -o coverage.html
 
 ## Dependencies
 
-- [zerolog](https://github.com/rs/zerolog) - Zero allocation JSON logger
-- [lumberjack](https://github.com/natefinch/lumberjack) - Log file rotation
+### Direct Dependencies
+
+- **[zerolog](https://github.com/rs/zerolog)** v1.34.0 - Zero allocation JSON logger
+  - Status: ✅ Actively maintained
+  - Last updated: March 2025
+
+- **[lumberjack](https://github.com/natefinch/lumberjack)** v2.2.1 - Log file rotation
+  - Status: ⚠️ Unmaintained (last release: Feb 2023)
+  - Security: No known CVEs
+  - Monitoring: Automated weekly checks via Dependabot and GitHub Actions
+
+### Dependency Status
+
+The lumberjack.v2 library is currently **unmaintained** but remains **stable and secure** with no known vulnerabilities. We have implemented automated monitoring to track its status:
+
+- **Dependabot**: Weekly checks for new versions
+- **Dependency Monitor**: Weekly workflow checking repository activity
+- **govulncheck**: Weekly vulnerability scans
+
+**Long-term plan**: We are monitoring the situation and will evaluate actively maintained alternatives (such as [log/slog](https://pkg.go.dev/log/slog) from Go 1.21+) if the dependency becomes problematic or security issues arise.
+
+**Current recommendation**: Safe to use. The library is feature-complete, stable, and has no known security vulnerabilities.
+
+### Security Notes
+
+- All dependencies are from trusted sources (GitHub, official Go repositories)
+- Module checksums are verified via `go.sum`
+- CodeQL and Dependency Review workflows run on all pull requests
+- Weekly vulnerability scanning with govulncheck
+
+For detailed security audit results, see [.audit/security-audit-dependencies.md](.audit/security-audit-dependencies.md).
 
 ## License
 

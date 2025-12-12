@@ -1,0 +1,73 @@
+name: Dependency Monitor
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday at midnight
+  workflow_dispatch:      # Allow manual trigger
+
+permissions:
+  contents: read
+
+jobs:
+  check-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
+      - name: Check for dependency updates
+        run: |
+          echo "=== Checking for available dependency updates ==="
+          go list -m -u all
+
+      - name: Run govulncheck
+        run: |
+          echo "=== Scanning for vulnerabilities ==="
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
+
+      - name: Check lumberjack maintenance status
+        run: |
+          echo "=== Checking lumberjack repository activity ==="
+          REPO="natefinch/lumberjack"
+          API_URL="https://api.github.com/repos/$REPO/commits?per_page=1"
+
+          # Get the latest commit date
+          LAST_COMMIT=$(curl -s "$API_URL" | jq -r '.[0].commit.author.date // "unknown"')
+          echo "Last commit to $REPO: $LAST_COMMIT"
+
+          # Calculate days since last commit
+          if [ "$LAST_COMMIT" != "unknown" ]; then
+            LAST_COMMIT_EPOCH=$(date -d "$LAST_COMMIT" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "$LAST_COMMIT" +%s)
+            CURRENT_EPOCH=$(date +%s)
+            DAYS_SINCE=$((($CURRENT_EPOCH - $LAST_COMMIT_EPOCH) / 86400))
+            echo "Days since last commit: $DAYS_SINCE"
+
+            if [ $DAYS_SINCE -gt 365 ]; then
+              echo "⚠️  WARNING: No commits in over a year. Consider evaluating alternatives."
+            fi
+          fi
+
+          # Check for open issues and PRs
+          ISSUES=$(curl -s "https://api.github.com/repos/$REPO/issues?state=open" | jq '. | length')
+          PRS=$(curl -s "https://api.github.com/repos/$REPO/pulls?state=open" | jq '. | length')
+          echo "Open issues: $ISSUES"
+          echo "Open pull requests: $PRS"
+
+      - name: Verify dependencies
+        run: |
+          echo "=== Verifying module checksums ==="
+          go mod verify
+
+      - name: Summary
+        run: |
+          echo "=== Dependency Monitor Summary ==="
+          echo "✓ Dependency list updated"
+          echo "✓ Vulnerability scan completed"
+          echo "✓ Lumberjack status checked"
+          echo "✓ Module checksums verified"
