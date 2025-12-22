@@ -1,1 +1,1 @@
-/Users/olegiv/Desktop/Projects/AI/claude-code-support-tools/commands/setup-project-tools.md
+../shared/commands/setup-project-tools.md

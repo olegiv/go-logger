@@ -1,1 +1,1 @@
-/Users/olegiv/Desktop/Projects/AI/claude-code-support-tools/commands/no-ticket/commit-do.md
+../shared/commands/no-ticket/commit-do.md

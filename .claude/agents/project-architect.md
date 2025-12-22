@@ -1,1 +1,1 @@
-/Users/olegiv/Desktop/Projects/AI/claude-code-support-tools/agents/project-architect.md
+../shared/agents/project-architect.md

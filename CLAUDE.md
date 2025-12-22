@@ -33,7 +33,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Claude Code Extensions
 
-This project includes specialized Claude Code agents and commands for Go development:
+This project includes specialized Claude Code agents and commands for Go development. Some are shared via a git submodule from [claude-code-support-tools](https://github.com/olegiv/claude-code-support-tools).
+
+### Submodule Setup
+
+Shared tools are located in `.claude/shared/` as a git submodule. When cloning:
+
+```bash
+# Clone with submodules
+git clone --recurse-submodules <repo-url>
+
+# Or initialize after clone
+git submodule update --init --recursive
+```
+
+To update the submodule to latest:
+```bash
+git submodule update --remote .claude/shared
+git add .claude/shared
+git commit -m "Update claude-code-support-tools submodule"
+```
 
 ### Agents
 
@@ -42,7 +61,9 @@ Invoke agents with `@agent-name` in your message:
 - **@go-test-runner** - Run tests, analyze coverage, debug failures, write new tests
 - **@go-code-quality** - Run linters/formatters, fix code quality issues, enforce best practices
 - **@go-dependency-manager** - Update dependencies, check for vulnerabilities, manage versions
-- **@security-auditor** - Comprehensive security audits, vulnerability assessments, CVE analysis
+- **@security-auditor** - Comprehensive security audits, vulnerability assessments, CVE analysis (shared)
+- **@project-architect** - Analyze project and generate tailored Claude Code agents/commands (shared)
+- **@code-quality-auditor** - Scan for code quality issues and fix warnings
 
 ### Slash Commands
 
@@ -57,6 +78,9 @@ Quick commands for common workflows:
 - **/deps-update** - Check for and update dependencies
 - **/benchmark** - Run performance benchmarks
 - **/security-audit** - Comprehensive security audit with govulncheck and CVE analysis
+- **/commit-prepare** - Review changes and prepare a commit message
+- **/commit-do** - Create a git commit with the prepared message (shared)
+- **/setup-project-tools** - Generate tailored Claude Code agents/commands for this project (shared)
 
 ## Development Commands
 

@@ -1,1 +1,1 @@
-/Users/olegiv/Desktop/Projects/AI/claude-code-support-tools/agents/security-auditor.md
+../shared/agents/security-auditor.md
