@@ -254,6 +254,8 @@ git submodule update --init --recursive
 git submodule update --remote .claude/shared
 ```
 
+> **Note**: Some files in `.claude/agents/` and `.claude/commands/` are symlinks to the shared submodule. These may appear as broken links in GitHub's web UI, but work correctly when cloned locally.
+
 ### Quick Commands
 
 ```bash
