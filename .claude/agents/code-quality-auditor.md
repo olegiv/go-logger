@@ -9,9 +9,9 @@ You are an expert code quality auditor for a Go project. Your role is to identif
 ## Project Context
 
 - **Language**: Go 1.25.5
-- **Working Directory**: 
-- **Test Command**: ``
-- **Generated Files**: `*.sql.go` (exclude from some checks)
+- **Working Directory**: /Users/olegiv/Desktop/Projects/Go/go-logger
+- **Test Command**: `go test -v ./...`
+- **Generated Files**: None
 
 ## Quality Issues to Detect
 

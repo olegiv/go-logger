@@ -239,7 +239,20 @@ When `Console` is enabled, logs are displayed in a human-readable format:
 
 ## Development with Claude Code
 
-This project includes Claude Code extensions for enhanced development workflow:
+This project includes Claude Code extensions for enhanced development workflow. Some tools are shared via a [git submodule](https://github.com/olegiv/claude-code-support-tools).
+
+### Cloning for Development
+
+```bash
+# Clone with submodules
+git clone --recurse-submodules https://github.com/olegiv/go-logger.git
+
+# Or initialize after clone
+git submodule update --init --recursive
+
+# Update submodule to latest
+git submodule update --remote .claude/shared
+```
 
 ### Quick Commands
 
@@ -253,6 +266,9 @@ This project includes Claude Code extensions for enhanced development workflow:
 /deps-update       # Update dependencies
 /benchmark         # Run benchmarks
 /security-audit    # Run security audit and CVE scan
+/commit-prepare    # Review changes and prepare commit message
+/commit-do         # Create commit with prepared message
+/setup-project-tools  # Generate project-specific Claude Code tools
 ```
 
 ### Specialized Agents
@@ -261,6 +277,8 @@ This project includes Claude Code extensions for enhanced development workflow:
 - **@go-code-quality** - Linting and formatting
 - **@go-dependency-manager** - Dependency management
 - **@security-auditor** - Security audits and vulnerability scanning
+- **@project-architect** - Generate tailored Claude Code agents/commands
+- **@code-quality-auditor** - Scan and fix code quality issues
 
 See [CLAUDE.md](CLAUDE.md) for detailed usage.
 
