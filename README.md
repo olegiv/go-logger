@@ -341,7 +341,7 @@ For detailed security audit results, see [.audit/security-audit-dependencies.md]
 
 ## License
 
-MIT License - Copyright (c) 2025 Oleg Ivanchenko
+MIT License - Copyright (c) 2025-2026 Oleg Ivanchenko
 
 See [LICENSE](LICENSE) file for details.
 
