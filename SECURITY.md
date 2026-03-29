@@ -4,6 +4,7 @@
 
 | Version | Supported          | Security Updates |
 | ------- | ------------------ | ---------------- |
+| 0.2.x   | :white_check_mark: | Yes              |
 | 0.1.x   | :white_check_mark: | Yes              |
 | < 0.1   | :x:                | No               |
 
@@ -165,7 +166,7 @@ log.Info().
 
 ### Current Issues
 
-None reported as of 2025-12-09.
+None reported as of 2026-03-29.
 
 ### Fixed Issues
 
@@ -173,7 +174,7 @@ None reported as of 2025-12-09.
 
 ## Security Audit
 
-Last security audit: 2025-12-09
+Last security audit: 2026-03-29
 
 Audit findings available in:
 - `security-audit-summary.md`
@@ -185,7 +186,7 @@ Audit findings available in:
 
 ### Direct Dependencies
 
-- **zerolog** v1.34.0 - No known vulnerabilities
+- **zerolog** v1.35.0 - No known vulnerabilities
 - **lumberjack.v2** v2.2.1 - No known vulnerabilities (unmaintained)
 
 ### Monitoring
@@ -247,4 +248,4 @@ Hall of Fame:
 
 This security policy is reviewed quarterly and updated as needed.
 
-Last updated: 2025-12-09
+Last updated: 2026-03-29

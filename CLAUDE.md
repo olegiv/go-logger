@@ -28,8 +28,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Log files are written to `{LogDir}/{Filename}` (default: `./logs/go.log`)
 - Automatic rotation when file reaches `MaxSizeMB` (default: 10MB)
 - Keeps `MaxBackups` old files (default: 5)
-- Automatically deletes logs older than 30 days (hardcoded in `logger.go:61`)
-- Old logs are NOT compressed (`Compress: false` in `logger.go:62`)
+- Automatically deletes logs older than 30 days (hardcoded in `logger.go:86`)
+- Old logs are NOT compressed (`Compress: false` in `logger.go:87`)
 
 ## Claude Code Extensions
 
@@ -174,20 +174,22 @@ When creating a logger, these defaults apply:
 - `MaxSizeMB`: `10` if zero
 - `MaxBackups`: `5` if zero
 - `Console`: `false` by default
+- `DirMode`: `0750` if zero
+- `DisableCaller`: `false` by default (caller info included)
 - `MaxAge`: 30 days (hardcoded, not configurable)
 
 ## Important Implementation Details
 
-1. **Global Level Setting**: `New()` calls `zerolog.SetGlobalLevel()`, which affects ALL zerolog loggers in the process
-2. **Caller Information**: Automatically added to all logs via `.Caller()` in `logger.go:80`
+1. **Per-Instance Level**: `New()` sets the log level per logger instance via `.Level()` — no global state pollution
+2. **Caller Information**: Optional, controlled by `DisableCaller` config field (`logger.go:114`). Enabled by default for debugging; disable for privacy/security
 3. **Timestamp Format**: File logs use Unix timestamp; console uses `"2006-01-02 15:04:05"` format
 4. **No Compression**: Log rotation doesn't compress old files (set `Compress: false`)
-5. **Close() is a no-op**: The `Close()` method exists for API completeness but doesn't actually do anything (zerolog doesn't require explicit closing)
+5. **Close()**: Closes the underlying file writer to flush buffered logs (`logger.go:154-159`). Always call `Close()` when done
 
 ## Dependencies
 
-- Go 1.25.4
-- `github.com/rs/zerolog` v1.34.0 - Zero-allocation JSON logger
+- Go 1.25.6
+- `github.com/rs/zerolog` v1.35.0 - Zero-allocation JSON logger
 - `gopkg.in/natefinch/lumberjack.v2` v2.2.1 - Log file rotation
 
 ## License
