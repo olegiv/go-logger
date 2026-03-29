@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2026-03-29
+
+### Changed
+
+- Updated github.com/rs/zerolog from v1.34.0 to v1.35.0
+- Updated golang.org/x/sys from v0.40.0 to v0.42.0
+- Updated claude-code-support-tools submodule
+
+### Fixed
+
+- Corrected outdated CLAUDE.md documentation (Close(), global
+  level setting, caller info, dependency versions, line references,
+  missing DirMode/DisableCaller defaults)
+- Updated SECURITY.md with current versions, dates, and supported
+  versions table
+
 ## [0.2.1] - 2026-01-26
 
 ### Changed
@@ -80,6 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complete documentation and README
 - GitHub Actions workflows for CodeQL and Dependency Review
 
+[0.2.2]: https://github.com/olegiv/go-logger/releases/tag/v0.2.2
 [0.2.1]: https://github.com/olegiv/go-logger/releases/tag/v0.2.1
 [0.2.0]: https://github.com/olegiv/go-logger/releases/tag/v0.2.0
 [0.1.0]: https://github.com/olegiv/go-logger/releases/tag/v0.1.0
