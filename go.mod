@@ -3,7 +3,7 @@ module github.com/olegiv/go-logger
 go 1.25.6
 
 require (
-	github.com/rs/zerolog v1.34.0
+	github.com/rs/zerolog v1.35.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
