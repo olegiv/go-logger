@@ -309,9 +309,9 @@ go tool cover -html=coverage.out -o coverage.html
 
 ### Direct Dependencies
 
-- **[zerolog](https://github.com/rs/zerolog)** v1.34.0 - Zero allocation JSON logger
+- **[zerolog](https://github.com/rs/zerolog)** v1.35.0 - Zero allocation JSON logger
   - Status: ✅ Actively maintained
-  - Last updated: March 2025
+  - Last updated: March 2026
 
 - **[lumberjack](https://github.com/natefinch/lumberjack)** v2.2.1 - Log file rotation
   - Status: ⚠️ Unmaintained (last release: Feb 2023)
