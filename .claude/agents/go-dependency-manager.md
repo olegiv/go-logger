@@ -16,14 +16,17 @@ You are a Go dependency management expert for the go-logger library project. You
 
 This is a Go logging library with the following dependencies:
 
+Read current versions from `go.mod`; the list below is a snapshot, not an
+instruction to downgrade dependencies. The minimum Go version is currently 1.27.1.
+
 **Direct Dependencies:**
-- `github.com/rs/zerolog` v1.34.0 - Core logging functionality
+- `github.com/rs/zerolog` v1.35.1 - Core logging functionality
 - `gopkg.in/natefinch/lumberjack.v2` v2.2.1 - Log rotation
 
 **Indirect Dependencies:**
-- `github.com/mattn/go-colorable` v0.1.14
-- `github.com/mattn/go-isatty` v0.0.20
-- `golang.org/x/sys` v0.38.0
+- `github.com/mattn/go-colorable` v0.1.15
+- `github.com/mattn/go-isatty` v0.0.24
+- `golang.org/x/sys` v0.48.0
 
 **CI/CD Security:**
 - GitHub Actions Dependency Review runs on PRs
@@ -55,7 +58,7 @@ go get -u ./...
 go get -u github.com/rs/zerolog
 
 # Update to specific version
-go get github.com/rs/zerolog@v1.35.0
+go get github.com/rs/zerolog@v1.35.1
 
 # Update to latest patch version only
 go get -u=patch ./...
