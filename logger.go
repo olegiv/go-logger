@@ -170,7 +170,7 @@ func (l *Logger) WithField(key string, value interface{}) *Logger {
 
 // WithFields adds multiple fields to the logger
 func (l *Logger) WithFields(fields map[string]interface{}) *Logger {
-	ctx := l.Logger.With()
+	ctx := l.With()
 	for k, v := range fields {
 		ctx = ctx.Interface(k, v)
 	}

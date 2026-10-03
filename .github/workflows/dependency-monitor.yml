@@ -13,12 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: '1.25'
+          go-version-file: go.mod
 
       - name: Check for dependency updates
         run: |
@@ -45,7 +45,7 @@ jobs:
           if [ "$LAST_COMMIT" != "unknown" ]; then
             LAST_COMMIT_EPOCH=$(date -d "$LAST_COMMIT" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "$LAST_COMMIT" +%s)
             CURRENT_EPOCH=$(date +%s)
-            DAYS_SINCE=$((($CURRENT_EPOCH - $LAST_COMMIT_EPOCH) / 86400))
+            DAYS_SINCE=$(((CURRENT_EPOCH - LAST_COMMIT_EPOCH) / 86400))
             echo "Days since last commit: $DAYS_SINCE"
 
             if [ $DAYS_SINCE -gt 365 ]; then
