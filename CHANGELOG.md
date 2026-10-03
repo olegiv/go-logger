@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Go CI for builds, module verification, vet, race tests, golangci-lint, and govulncheck
+- golangci-lint configuration matching ocms-go
+- CodeQL analysis of GitHub Actions and weekly Dependabot updates for Actions
+- AGENTS.md with project guidance and validation commands
+
+### Changed
+
+- Raised the minimum Go version from 1.25.6 to 1.27.1
+- Updated golang.org/x/sys from v0.47.0 to v0.48.0 and removed obsolete checksums
+- Updated and pinned workflow Actions; dependency monitoring reads Go's version from go.mod
+
+### Fixed
+
+- Updated contributor prerequisites, dependency versions, and CI documentation
+- Corrected the documented rotation behavior: rotated logs are not compressed
+- Simplified WithFields and strengthened tests for emitted fields and context isolation
+
 ## [0.2.2] - 2026-03-29
 
 ### Changed

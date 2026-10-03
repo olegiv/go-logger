@@ -1,5 +1,6 @@
 # go-logger
 
+[![Go](https://github.com/olegiv/go-logger/actions/workflows/go.yml/badge.svg)](https://github.com/olegiv/go-logger/actions/workflows/go.yml)
 [![CodeQL Advanced](https://github.com/olegiv/go-logger/actions/workflows/codeql.yml/badge.svg)](https://github.com/olegiv/go-logger/actions/workflows/codeql.yml)
 [![Dependency review](https://github.com/olegiv/go-logger/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/olegiv/go-logger/actions/workflows/dependency-review.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/olegiv/go-logger.svg)](https://pkg.go.dev/github.com/olegiv/go-logger)
@@ -19,6 +20,8 @@ A lightweight, production-ready Go logging library built on top of [zerolog](htt
 - **Security hardened** with path traversal protection and secure directory permissions
 
 ## Installation
+
+Requires Go 1.27.1 or later, including for applications importing this module.
 
 ```bash
 go get github.com/olegiv/go-logger
@@ -76,7 +79,7 @@ The `Config` struct supports the following options:
 
 ### Log Rotation
 
-Logs are automatically rotated when they reach the `MaxSizeMB` size limit. Old logs are compressed and retained according to the `MaxBackups` setting. Logs older than 30 days are automatically deleted.
+Logs are automatically rotated when they reach the `MaxSizeMB` size limit. Old logs are retained without compression according to the `MaxBackups` setting. Logs older than 30 days are automatically deleted.
 
 ## Usage Examples
 
@@ -289,7 +292,7 @@ See [CLAUDE.md](CLAUDE.md) for detailed usage.
 Run the test suite:
 
 ```bash
-go test -v
+go test -mod=readonly -race -v ./...
 ```
 
 Run tests with coverage:
@@ -305,13 +308,34 @@ go test -coverprofile=coverage.out
 go tool cover -html=coverage.out -o coverage.html
 ```
 
+## Code Quality
+
+The Go workflow builds the library, verifies module checksums, and runs vet,
+race tests, golangci-lint v2.14.0, and govulncheck on pushes and pull requests
+to `master`. It reads the Go version from `go.mod`.
+
+Run static checks locally with:
+
+```bash
+go vet -mod=readonly ./...
+golangci-lint run ./...
+govulncheck ./...
+```
+
+The lint configuration in `.golangci.yml` matches `ocms-go`. CodeQL scans Go
+and GitHub Actions, and dependency review checks pull requests. Dependabot
+checks Go modules and pinned Actions weekly; the dependency monitor also
+checks updates, vulnerabilities, checksums, and lumberjack activity weekly.
+
+See [AGENTS.md](AGENTS.md) for coding-agent guidance.
+
 ## Dependencies
 
 ### Direct Dependencies
 
-- **[zerolog](https://github.com/rs/zerolog)** v1.35.0 - Zero allocation JSON logger
+- **[zerolog](https://github.com/rs/zerolog)** v1.35.1 - Zero allocation JSON logger
   - Status: ✅ Actively maintained
-  - Last updated: March 2026
+  - Last updated: April 2026
 
 - **[lumberjack](https://github.com/natefinch/lumberjack)** v2.2.1 - Log file rotation
   - Status: ⚠️ Unmaintained (last release: Feb 2023)

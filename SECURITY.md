@@ -186,7 +186,7 @@ Audit findings available in:
 
 ### Direct Dependencies
 
-- **zerolog** v1.35.0 - No known vulnerabilities
+- **zerolog** v1.35.1 - No known vulnerabilities
 - **lumberjack.v2** v2.2.1 - No known vulnerabilities (unmaintained)
 
 ### Monitoring

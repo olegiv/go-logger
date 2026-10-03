@@ -151,8 +151,11 @@ go list -m all | grep -v "go-logger"
 
 ### CI/CD
 This project uses GitHub Actions for automated checks:
-- **CodeQL**: Runs on push/PR to master, plus weekly schedule
+- **Go**: Builds, verifies modules, runs vet, race tests, golangci-lint v2.14.0, and govulncheck on push/PR to master; reads the Go version from go.mod
+- **CodeQL**: Scans Go and GitHub Actions on push/PR to master, plus weekly schedule
 - **Dependency Review**: Runs on PRs to detect vulnerable dependencies
+- **Dependency Monitor**: Checks updates, vulnerabilities, checksums, and lumberjack activity weekly and on manual dispatch
+- **Dependabot**: Checks Go modules and pinned GitHub Actions weekly
 
 ## Testing Philosophy
 
@@ -188,8 +191,8 @@ When creating a logger, these defaults apply:
 
 ## Dependencies
 
-- Go 1.25.6
-- `github.com/rs/zerolog` v1.35.0 - Zero-allocation JSON logger
+- Go 1.27.1 or later
+- `github.com/rs/zerolog` v1.35.1 - Zero-allocation JSON logger
 - `gopkg.in/natefinch/lumberjack.v2` v2.2.1 - Log file rotation
 
 ## License

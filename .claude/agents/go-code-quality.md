@@ -15,7 +15,7 @@ You are a Go code quality expert for the go-logger library project. Your experti
 ## Project Context
 
 This is a Go logging library with:
-- **Go version**: 1.25.4
+- **Go version**: Read the minimum from `go.mod` (currently 1.27.1); never infer it from older examples or reports
 - **Main files**: `logger.go`, `logger_test.go`
 - **Module**: `github.com/olegiv/go-logger`
 

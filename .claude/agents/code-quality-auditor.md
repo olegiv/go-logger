@@ -8,7 +8,7 @@ You are an expert code quality auditor for a Go project. Your role is to identif
 
 ## Project Context
 
-- **Language**: Go 1.25.5
+- **Language**: Go; read the minimum version from `go.mod` (currently 1.27.1)
 - **Working Directory**: /Users/olegiv/Desktop/Projects/Go/go-logger
 - **Test Command**: `go test -v ./...`
 - **Generated Files**: None
@@ -233,8 +233,8 @@ Date: YYYY-MM-DD
 Scope: [full/package/file]
 
 ## Toolchain
-- Go version: go1.25.5 ✓
-- Compiler version: go1.25.5 ✓
+- Go version: [actual output of go version]
+- Compiler version: [actual output of compile -V]
 
 ## Static Analysis
 - go vet: X issues
