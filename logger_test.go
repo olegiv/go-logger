@@ -1,6 +1,8 @@
 package logger
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
@@ -420,19 +422,46 @@ func TestLogRotationSettings(t *testing.T) {
 }
 
 func TestWithFieldsPreservesOriginal(t *testing.T) {
-	tmpDir := t.TempDir()
-
-	cfg := Config{
-		Level:  "info",
-		LogDir: tmpDir,
+	tests := []struct {
+		name   string
+		fields map[string]interface{}
+	}{
+		{name: "nil"},
+		{name: "empty", fields: map[string]interface{}{}},
+		{name: "multiple", fields: map[string]interface{}{
+			"request": "abc", "count": float64(123), "enabled": true,
+		}},
 	}
-
-	original := New(cfg)
-	modified := original.WithField("test", "value")
-
-	// Original should be unchanged
-	if original == modified {
-		t.Error("WithField should create a new logger instance")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var output bytes.Buffer
+			original := &Logger{Logger: zerolog.New(&output).With().Str("service", "test").Logger()}
+			modified := original.WithFields(tt.fields)
+			if original == modified {
+				t.Fatal("WithFields should create a new logger instance")
+			}
+			modified.Info().Msg("modified")
+			original.Info().Msg("original")
+			decoder := json.NewDecoder(&output)
+			for _, message := range []string{"modified", "original"} {
+				var event map[string]interface{}
+				if err := decoder.Decode(&event); err != nil {
+					t.Fatalf("Decode %s log: %v", message, err)
+				}
+				if event["message"] != message || event["service"] != "test" {
+					t.Errorf("Missing message or inherited context in %s log: %v", message, event)
+				}
+				for key, want := range tt.fields {
+					got, exists := event[key]
+					if message == "modified" && (!exists || got != want) {
+						t.Errorf("Field %s = %v, want %v", key, got, want)
+					}
+					if message == "original" && exists {
+						t.Errorf("WithFields leaked field %s into original logger", key)
+					}
+				}
+			}
+		})
 	}
 }
 
