@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-03
+
 ### Added
 
 - Go CI for builds, module verification, vet, race tests, golangci-lint, and govulncheck
@@ -17,7 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Raised the minimum Go version from 1.25.6 to 1.27.1
-- Updated golang.org/x/sys from v0.47.0 to v0.48.0 and removed obsolete checksums
+- Updated github.com/rs/zerolog from v1.35.0 to v1.35.1
+- Updated github.com/mattn/go-colorable from v0.1.14 to v0.1.15
+- Updated github.com/mattn/go-isatty from v0.0.20 to v0.0.24
+- Updated golang.org/x/sys from v0.42.0 to v0.48.0 and removed obsolete checksums
 - Updated and pinned workflow Actions; dependency monitoring reads Go's version from go.mod
 
 ### Fixed
@@ -117,6 +122,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complete documentation and README
 - GitHub Actions workflows for CodeQL and Dependency Review
 
+[Unreleased]: https://github.com/olegiv/go-logger/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/olegiv/go-logger/releases/tag/v0.3.0
 [0.2.2]: https://github.com/olegiv/go-logger/releases/tag/v0.2.2
 [0.2.1]: https://github.com/olegiv/go-logger/releases/tag/v0.2.1
 [0.2.0]: https://github.com/olegiv/go-logger/releases/tag/v0.2.0
